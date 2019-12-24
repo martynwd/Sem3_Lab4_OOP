@@ -10,6 +10,7 @@ using System.Xml;
 using System.Xml.Serialization;
 using System.Xml.Linq;
 using System.Data.SqlClient;
+using System.Runtime.Serialization.Formatters.Binary;
 
 
 namespace Lab4
@@ -58,11 +59,21 @@ namespace Lab4
             }
              
         }
+        public static void SerializeTriangleBin(Triangle triangle)
+        {
+            BinaryFormatter Bin = new BinaryFormatter();
+
+            using (FileStream fs = new FileStream("TriangleSerialize.xml", FileMode.OpenOrCreate))
+            {
+                Bin.Serialize(fs, triangle);
+            }
+
+        }
         public static Triangle DeSerializeTriangle (Triangle triangle)
         {
             XmlSerializer xml = new XmlSerializer(typeof(Triangle));
 
-            using (FileStream fs = new FileStream("TriangleSerialize.xml", FileMode.OpenOrCreate))
+            using (FileStream fs = new FileStream("TriangleSerialize.dat", FileMode.OpenOrCreate))
             {
                 Triangle returnned_trinagle = (Triangle)xml.Deserialize(fs);
 
@@ -71,6 +82,20 @@ namespace Lab4
             }
 
         }
+        public static Triangle DeSerializeTriangleBin(Triangle triangle)
+        {
+            BinaryFormatter Bin = new BinaryFormatter();
+
+            using (FileStream fs = new FileStream("TriangleSerialize.dat", FileMode.OpenOrCreate))
+            {
+                Triangle returnned_trinagle = (Triangle)Bin.Deserialize(fs);
+
+                return returnned_trinagle;
+
+            }
+
+        }
+
         public int ToSql(string connectionstring)
         {
             if (id != -1)
