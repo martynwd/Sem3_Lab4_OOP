@@ -26,7 +26,7 @@ namespace Lab4
         //var t1 = triangle.fromsql(connectionstring, 11);
         
        
-       Triangle.DeSerializeTriangle(test);
+       //Triangle.DeSerializeTriangle(test);
 
     }
 }       

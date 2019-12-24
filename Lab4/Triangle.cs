@@ -19,7 +19,9 @@ namespace Lab4
     {
         List<Point> points;
         public int id { get; private set; }
-
+        int a_id;
+        int b_id;
+        int c_id;
 
         public Triangle (Point a,Point b,Point c)
         {
@@ -69,50 +71,54 @@ namespace Lab4
             }
 
         }
-        public int tosql(string connectionstrin_)
+        public int ToSql(string connectionstring)
         {
             if (id != -1)
                 return -1;
 
-            a.tosql(connectionstring);
-            b.tosql(connectionstring);
-            c.tosql(connectionstring);
-            var command = new sqlcommand($"insert into triangles " +
-                                         $"values ({a.id}, {b.id}, {c.id}) " +
+
+            foreach (Point point in points)
+            {
+                point.ToSql(connectionstring);
+            }
+           
+           
+            var command = new SqlCommand($"insert into triangles " +
+                                         $"values ({points[0].id}, {points[1].id}, {points[2].id}) " +
                                          $"select scope_identity()")
-            { connection = new sqlconnection(connectionstring) };
+            { connection = new SqlConnection(connectionstring) };
             command.connection.open();
-            id = convert.toint32(command.executescalar());
+            id = Convert.ToInt32(command.executescalar());
             command.connection.close();
             return id;
         }
-        public static triangle fromsql(string connectionstring, int id)
+        public static Triangle fromsql(string connectionstring, int id)
         {
 
-            var command = new sqlcommand("select x, y, points.id " +
+            var command = new SqlCommand("select x, y, points.id " +
                                          "from " +
                                          "points join triangles " +
                                          "on (triangles.point1 = points.id or " +
                                          "triangles.point2 = points.id or " +
                                          "triangles.point3 = points.id) " +
                                          $"where triangles.id = {id}")
-            { connection = new sqlconnection(connectionstring) };
+            { connection = new SqlConnection(connectionstring) };
             command.connection.open();
             using (var reader = command.executereader())
             {
                 if (!reader.hasrows)
                     return null;
-                point p1, p2, p3;
+                Point p1, p2, p3;
                 reader.read();
-                p1 = new point(reader.getdouble(0), reader.getdouble(1));
+                p1 = new Point(reader.getdouble(0), reader.getdouble(1));
                 p1.id = reader.getint32(2);
                 reader.read();
-                p2 = new point(reader.getdouble(0), reader.getdouble(1));
+                p2 = new Point(reader.getdouble(0), reader.getdouble(1));
                 p2.id = reader.getint32(2);
                 reader.read();
-                p3 = new point(reader.getdouble(0), reader.getdouble(1));
+                p3 = new Point(reader.getdouble(0), reader.getdouble(1));
                 p3.id = reader.getint32(2);
-                triangle res = new triangle(p1, p2, p3);
+                Triangle res = new Triangle(p1, p2, p3);
                 res.id = id;
                 return res;
             }
